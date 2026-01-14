@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+	const blogPosts = await getCollection('blog');
+	return blogPosts.map((post) => ({
+		params: { slug: post.slug },
+		props: post,
+	}));
+}
+
+type Props = CollectionEntry<'blog'>;
+
+const post = Astro.props;
+const { Content } = await post.render();
+---
+
+<BaseLayout title={post.data.title}>
+	<article>
+		<header style="margin-bottom: 2rem;">
+			<h1>{post.data.title}</h1>
+			{post.data.description && (
+				<p style="font-size: 1.1rem; opacity: 0.8; margin-bottom: 1rem;">
+					{post.data.description}
+				</p>
+			)}
+			<time
+				style="font-size: 0.9rem; opacity: 0.7;"
+				datetime={post.data.pubDate.toISOString()}
+			>
+				{post.data.pubDate.toLocaleDateString('en-US', {
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+				})}
+			</time>
+		</header>
+		<div class="post-content">
+			<Content />
+		</div>
+		<footer style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+			<a href="/blog">← Back to Blog</a>
+		</footer>
+	</article>
+</BaseLayout>
+
+<style>
+	.post-content {
+		font-size: 1rem;
+		line-height: var(--line-height);
+	}
+
+	.post-content :global(h1) {
+		font-size: 1.75rem;
+		margin-top: 2rem;
+		margin-bottom: 1rem;
+	}
+
+	.post-content :global(h2) {
+		font-size: 1.5rem;
+		margin-top: 1.5rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.post-content :global(h3) {
+		font-size: 1.25rem;
+		margin-top: 1.25rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.post-content :global(p) {
+		margin-bottom: 1rem;
+	}
+
+	.post-content :global(ul),
+	.post-content :global(ol) {
+		margin-bottom: 1rem;
+	}
+</style>
