@@ -2,12 +2,82 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="Welcome">
-	<h1>Welcome</h1>
-	<p>
-		This is a minimal personal site with a notes-like aesthetic. Plain text, fast loading, minimal JavaScript.
-	</p>
-	<p>
-		Navigate through the sections above to explore different areas.
-	</p>
+<BaseLayout title="notes on me:">
+	<h1>the journey:</h1>
+	<button class="sort-toggle" id="sort-toggle" aria-label="Toggle sort order">
+		ascending / descending
+	</button>
+	<ul class="journey-list" id="journey-list">
+		<li data-date="2025-11"><span class="date">(nov 2025 - present)</span> open-source RL envs at pufferlib <a href="#">(1)</a>, applesauce agentic framework <a href="#">(2)</a>, neural net from scratch in c <a href="#">(3)</a>, three.js experiments <a href="#">(4)</a></li>
+		<li data-date="2025-06"><span class="date">(jun 2025 - oct 2025)</span> cto of DealQ - AI underwriting platform for commercial real estate funds. handled $120m in dealflow during private beta. paying enterprise customers. <a href="#">codebase / technical blog post</a></li>
+		<li data-date="2025-02"><span class="date">(feb 2025 - may 2025)</span> consumer mobile apps. built <a href="#">lastparlay</a> & <a href="#">kibble</a>. 10M views across platforms, 900+ downloads. ran organic ugc + reddit campaigns.</li>
+		<li data-date="2024-09"><span class="date">(sept 2024 - jan 2025)</span> self-teach full stack enginnering curriculum. raw dog, the old way, no ai tools.</li>
+		<li data-date="2022-06"><span class="date">(jun 2022 - aug 2024)</span> analyst at private credit megafund in nyc. lead on $1.2B worth of deals across 10 transactions. got promoted and left to build software.</li>
+		<li data-date="2022-05"><span class="date">(may 2022)</span> graduated usc marshall. studied finance, real estate development, and design.</li>
+	</ul>
+	<script>
+		(function() {
+			const list = document.getElementById('journey-list');
+			const toggle = document.getElementById('sort-toggle');
+			let isAscending = false; // Start with descending (newest first)
+
+			// Sort function
+			function sortList() {
+				const items = Array.from(list.children);
+				const sorted = items.sort((a, b) => {
+					const dateA = a.getAttribute('data-date');
+					const dateB = b.getAttribute('data-date');
+					return isAscending
+						? dateA.localeCompare(dateB) // Ascending (oldest first)
+						: dateB.localeCompare(dateA); // Descending (newest first)
+				});
+				sorted.forEach(item => list.appendChild(item));
+				toggle.textContent = isAscending ? 'ascending / descending' : 'descending / ascending';
+			}
+
+			// Initial sort (descending by default - newest first)
+			sortList();
+
+			// Toggle on click
+			toggle.addEventListener('click', () => {
+				isAscending = !isAscending;
+				sortList();
+			});
+		})();
+	</script>
+	<style>
+		.journey-list {
+			list-style: none;
+			margin-left: 0;
+			padding-left: 0;
+		}
+
+		.journey-list li {
+			margin-bottom: 1rem;
+		}
+
+		.journey-list .date {
+			font-weight: 700;
+			color: var(--text-color);
+		}
+
+		.sort-toggle {
+			background: transparent;
+			border: none;
+			color: var(--text-color);
+			cursor: pointer;
+			font-size: 0.9rem;
+			margin-bottom: 1.5rem;
+			padding: 0;
+			text-decoration: underline;
+			text-decoration-thickness: 1px;
+			text-underline-offset: 2px;
+			transition: opacity 0.2s;
+			font-family: inherit;
+		}
+
+		.sort-toggle:hover {
+			opacity: 0.7;
+		}
+	</style>
 </BaseLayout>

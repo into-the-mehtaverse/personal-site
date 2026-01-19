@@ -4,6 +4,13 @@ interface Props {
 }
 
 const { title = "Personal Site" } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const isActive = (path: string) => {
+	if (path === '/' && currentPath === '/') return true;
+	if (path !== '/' && currentPath.startsWith(path)) return true;
+	return false;
+};
 ---
 
 <!doctype html>
@@ -19,14 +26,14 @@ const { title = "Personal Site" } = Astro.props;
 	<body>
 		<div class="container">
 			<header class="site-header">
-				<h1 class="site-title">mehtamorphic</h1>
+				<h1 class="site-title">shaan mehta</h1>
 			</header>
 			<nav class="nav">
 				<div class="nav-links">
-					<a href="/">home</a>
-					<a href="/code">code</a>
-					<a href="/blog">blog</a>
-					<a href="/design">design</a>
+					<a href="/" class={isActive('/') ? 'active' : ''}>home</a>
+					<a href="/code" class={isActive('/code') ? 'active' : ''}>code</a>
+					<a href="/blog" class={isActive('/blog') ? 'active' : ''}>blog</a>
+					<a href="/design" class={isActive('/design') ? 'active' : ''}>design</a>
 				</div>
 				<button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
 					<span class="theme-toggle-dot"></span>
@@ -122,8 +129,6 @@ const { title = "Personal Site" } = Astro.props;
 
 	.nav {
 		margin-bottom: 3rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid var(--border-color);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -146,6 +151,10 @@ const { title = "Personal Site" } = Astro.props;
 
 	.nav a:hover {
 		opacity: 0.7;
+	}
+
+	.nav a.active {
+		font-weight: 575;
 	}
 
 	.theme-toggle {
