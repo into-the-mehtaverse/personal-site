@@ -17,18 +17,49 @@ const { title = "Personal Site" } = Astro.props;
 		<title>{title}</title>
 	</head>
 	<body>
-		<nav class="nav">
-			<a href="/">Welcome</a>
-			<a href="/work">Work</a>
-			<a href="/design">Design</a>
-			<a href="/research">Research</a>
-			<a href="/blog">Blog</a>
-			<a href="/misc">Misc</a>
-		</nav>
+		<div class="container">
+			<header class="site-header">
+				<h1 class="site-title">mehtamorphic</h1>
+			</header>
+			<nav class="nav">
+				<div class="nav-links">
+					<a href="/">home</a>
+					<a href="/code">code</a>
+					<a href="/blog">blog</a>
+					<a href="/design">design</a>
+				</div>
+				<button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+					<span class="theme-toggle-dot"></span>
+				</button>
+			</nav>
 		<main class="main">
 			<slot />
 		</main>
-	</body>
+	</div>
+	<script>
+		(function() {
+			// Initialize theme - default to light mode
+			const theme = localStorage.getItem('theme') || 'light';
+			const html = document.documentElement;
+
+			if (theme === 'dark') {
+				html.classList.add('dark');
+			} else {
+				html.classList.remove('dark');
+			}
+
+			// Toggle theme
+			const themeToggle = document.getElementById('theme-toggle');
+			if (themeToggle) {
+				themeToggle.addEventListener('click', () => {
+					html.classList.toggle('dark');
+					const isDark = html.classList.contains('dark');
+					localStorage.setItem('theme', isDark ? 'dark' : 'light');
+				});
+			}
+		})();
+	</script>
+</body>
 </html>
 
 <style is:global>
@@ -39,8 +70,8 @@ const { title = "Personal Site" } = Astro.props;
 	}
 
 	:root {
-		--text-color: #1a1a1a;
-		--bg-color: #ffffff;
+		--text-color: #130303;
+		--bg-color: #FBF7F4;
 		--link-color: #0066cc;
 		--link-hover: #004499;
 		--border-color: #e0e0e0;
@@ -48,14 +79,16 @@ const { title = "Personal Site" } = Astro.props;
 		--line-height: 1.7;
 	}
 
-	@media (prefers-color-scheme: dark) {
-		:root {
-			--text-color: #e0e0e0;
-			--bg-color: #1a1a1a;
-			--link-color: #4da6ff;
-			--link-hover: #66b3ff;
-			--border-color: #333333;
-		}
+	html.dark {
+		--text-color: #e0e0e0;
+		--bg-color: #1a1a1a;
+		--link-color: #4da6ff;
+		--link-hover: #66b3ff;
+		--border-color: #333333;
+	}
+
+	html.dark blockquote {
+		color: #999;
 	}
 
 	html {
@@ -67,23 +100,47 @@ const { title = "Personal Site" } = Astro.props;
 		background-color: var(--bg-color);
 		color: var(--text-color);
 		line-height: var(--line-height);
-		padding: 2rem 1rem;
+		padding: 4rem 1rem 2rem 1rem;
+	}
+
+	.container {
+		width: 40%;
+		margin: 0 auto;
+	}
+
+	.site-header {
+		margin-bottom: 1.75rem;
+	}
+
+	.site-title {
+		font-size: 1.75rem;
+		font-weight: 700;
+		text-align: left;
+		margin: 0;
+		padding: 0;
 	}
 
 	.nav {
-		max-width: var(--max-width);
-		margin: 0 auto 3rem auto;
+		margin-bottom: 3rem;
 		padding-bottom: 1rem;
 		border-bottom: 1px solid var(--border-color);
 		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		gap: 1.5rem;
+		flex-wrap: wrap;
+	}
+
+	.nav-links {
+		display: flex;
+		gap: 2rem;
 		flex-wrap: wrap;
 	}
 
 	.nav a {
 		color: var(--text-color);
 		text-decoration: none;
-		font-size: 0.9rem;
+		font-size: 1.1rem;
 		transition: opacity 0.2s;
 	}
 
@@ -91,9 +148,34 @@ const { title = "Personal Site" } = Astro.props;
 		opacity: 0.7;
 	}
 
+	.theme-toggle {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		background-color: transparent;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+		transition: all 0.2s;
+		border: none;
+	}
+
+	.theme-toggle:hover {
+		opacity: 0.7;
+	}
+
+	.theme-toggle-dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background-color: var(--text-color);
+		display: block;
+	}
+
 	.main {
-		max-width: var(--max-width);
-		margin: 0 auto;
+		width: 100%;
 	}
 
 	h1 {
@@ -174,11 +256,6 @@ const { title = "Personal Site" } = Astro.props;
 		color: #666;
 	}
 
-	@media (prefers-color-scheme: dark) {
-		blockquote {
-			color: #999;
-		}
-	}
 
 	img {
 		max-width: 100%;
