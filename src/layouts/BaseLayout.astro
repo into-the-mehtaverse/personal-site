@@ -22,6 +22,15 @@ const isActive = (path: string) => {
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<script is:inline>
+			(function() {
+				// Initialize theme immediately before page renders to prevent flash
+				const theme = localStorage.getItem('theme') || 'light';
+				if (theme === 'dark') {
+					document.documentElement.classList.add('dark');
+				}
+			})();
+		</script>
 	</head>
 	<body>
 		<div class="container">
