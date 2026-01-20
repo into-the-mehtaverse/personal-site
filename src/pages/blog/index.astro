@@ -7,9 +7,8 @@ const blogPosts = (await getCollection('blog')).sort(
 );
 ---
 
-<BaseLayout title="Blog">
-	<h1>Blog</h1>
-	<p>A collection of thoughts and writings.</p>
+<BaseLayout title="collections:">
+	<h1>collections:</h1>
 
 	<ul style="list-style: none; margin-left: 0; margin-top: 2rem;">
 		{blogPosts.map((post) => (
