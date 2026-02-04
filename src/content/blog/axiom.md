@@ -4,15 +4,13 @@ description: "Pt. 2 of building undeniable technical ability"
 pubDate: 2026-02-03
 ---
 
-Axiom is a neural network library I wrote in pure C that achieves **96.5% accuracy on MNIST**—with zero external dependencies. It's just ~1,000 lines of C and the standard library.
+Let me introduce you to **Axiom**, a neural network library I wrote in pure C that achieves **96.5% accuracy on MNIST** and has zero external dependencies. It's just ~1,000 lines of C and the standard library.
+
+I began learning ML 100 days ago (I've been documenting my progress daily on [X](https://x.com/MehtaDontStop/status/2015997510330744843)), prior to which, I had no ML experience (though my background is in software). In the first ~92 days, I completed Andrew Ng's DeepLearning specialization & three Kaggle comps [(1)](https://github.com/into-the-mehtaverse/machine-learning), built a segmentation studio using the SAM model [(2)](https://github.com/into-the-mehtaverse/segmentation-studio), and wrote the LSTM forward pass in python and pure C without imports [(3)](https://github.com/into-the-mehtaverse/lstm-no-imports). Over the last 8 days, I built Axiom to cement my knowledge and solidify my mastery over the fundamentals.
+
+My motivation behind building Axiom stems from curiosity. I wasn't satisfied with using methods like Pytorch's "loss.backward()" and training with tensors without knowing what's behind the hood; abstraction removes boilerplate at the expense of deep learning (no pun intended). The only way to truly know is to build it myself.
 
 I used an LLM to scaffold boilerplate (function definitions, etc, directed by me), but every line of logic is mine. The matrix multiplications, the backpropagation, the memory management are all handwritten.
-
-Why? Because modern ML frameworks are black boxes, and it was time for me to go deeper.
-
-I began learning ML 100 days ago (I've been [documenting my progress daily on X](https://x.com/MehtaDontStop/status/2015997510330744843)). In the first ~92 days, I completed [Andrew Ng's DeepLearning specialization & three Kaggle comps](https://github.com/into-the-mehtaverse/machine-learning), built a [segmentation studio using the SAM model](https://github.com/into-the-mehtaverse/segmentation-studio), and wrote the [LSTM forward pass in python and pure C without imports](https://github.com/into-the-mehtaverse/lstm-no-imports). Over the last 8 days, I built Axiom to cement my knowledge and solidify my mastery over the fundamentals.
-
-I wasn't satisfied with using methods like Pytorch's "loss.backward()" and training with tensors without knowing what's behind the hood; abstraction removes boilerplate at the expense of deep learning (no pun intended). The only way to truly know is to build it yourself.
 
 Quick API usage example:
 
@@ -54,27 +52,7 @@ I purposely built this library modularly so that I can extend it and experiment 
 
 ---
 
-## Technical Decisions
-
-### Stride-Based Tensor Indexing
-
-I wanted to understand how a tensor actually works. In reality, it turned out to be simpler than I'd imagined: a tensor is just a blob of floats *plus metadata* that tells you how to interpret them. My `Tensor` struct stores:
-
-```c
-typedef struct {
-    float* data;      // raw values
-    size_t* shape;    // dimensions [batch, features]
-    size_t* strides;  // elements to jump per dimension
-    size_t ndim;
-    size_t size;
-} Tensor;
-```
-
-Strides are the key insight. For a 2D tensor with shape `[3, 4]`, the strides are `[4, 1]`—meaning to move one row, you skip 4 elements; to move one column, you skip 1. Element `[i, j]` lives at `data[i * strides[0] + j * strides[1]]`.
-
-Why does this matter? Strides let me change how data is *viewed* without copying it. A transpose is just swapping the strides and shape—the underlying data stays put, saving tremendous computational overhead. (My implementation does copy for simplicity, but the architecture supports the optimization.)
-
-Every matrix operation—matmul, add, broadcast—uses stride-aware indexing. It's more verbose than flat indexing, but it's what makes the tensor engine general-purpose. When I'm working with large amounts of data with expensive operations, this matters immensely.
+## Technical Revelations
 
 ### Cache-Optimal Matrix Multiplication
 
@@ -95,7 +73,7 @@ I realized this was running way slower than what I was used to seeing in Pytorch
 
 What I learned: the problem is memory access patterns. In row-major storage (how C lays out 2D arrays), values in the same row are stored next to each other sequentially. There's a limit to how much can be stored in layer of memory, and there's a difference in how fast each memory layer is. There are registers, which are the fastest / available for immediate access, then the L1 / L2 type caches, then the RAM, each of which is progressively slower to access. In fact, L1 cache access might be 2-3x CPU cycles (essentially how time is measured with CPU processes), whereas accessing RAM might be 200x CPU cycles. So, since `B[k][j]` with varying `k` in the inner loop jumps across rows—each access is a cache miss. Meaning you need to access RAM instead of L1 cache (for example) everytime you jump between rows, so it could be ~200x slower for these operations.
 
-The fix is reordering the loops:
+The fix, I learned, is reordering the loops:
 
 ```c
 // Cache-friendly ikj ordering
@@ -109,7 +87,29 @@ for (int i = 0; i < m; i++) {
 }
 ```
 
-Now the inner loop walks `B` sequentially across columns and `C` sequentially across columns. Both are cache-friendly. While the math remains unchanged, the improvement is dramatic as we're now optimally utilizing the hardware.
+Now the inner loop walks `B` sequentially across columns and `C` sequentially across columns. Both ops become cache-friendly. While the math remains unchanged, the improvement is dramatic as we're now optimally utilizing the hardware.
+
+
+### Stride-Based Tensor Indexing
+
+I wanted to understand how a tensor actually works. It turned out to be simpler than I'd imagined: a tensor is just a blob of floats plus metadata that tells me how to interpret them. My `Tensor` struct stores:
+
+```c
+typedef struct {
+    float* data;      // raw values
+    size_t* shape;    // dimensions [batch, features]
+    size_t* strides;  // elements to jump per dimension
+    size_t ndim;
+    size_t size;
+} Tensor;
+```
+
+I learned strides are one of the very useful pieces of a tensor. For a 2D tensor with shape `[3, 4]`, the strides are `[4, 1]`—meaning to move one row, you skip 4 elements; to move one column, you skip 1. Element `[i, j]` lives at `data[i * strides[0] + j * strides[1]]`.
+
+This matters because strides let me change how data is viewed without copying it. A transpose operation just becomes swapping the strides and shape. The underlying data stays put, saving tremendous computational overhead. (My implementation does copy for simplicity, but the architecture supports the optimization.)
+
+All matrix operations like matmul, add, broadcast, etc. use stride-aware indexing. It's what makes the tensor engine general-purpose. When I'm working with large amounts of data with expensive operations, this matters immensely.
+
 
 ### Manual Memory Management & Backpropagation
 
@@ -132,7 +132,7 @@ Tensor* tensor_create(size_t* shape, size_t ndim) {
 }
 ```
 
-Every allocation can fail. Every failure must clean up everything allocated before it. This cascading pattern repeats throughout the codebase.
+Every allocation can fail. Every failure must clean up everything allocated before it. I repeat cascading pattern repeats throughout the codebase.
 
 Backpropagation adds another dimension: intermediate values from the forward pass must be cached for the backward pass. My `DenseLayer` stores `input_cache`—the input tensor it saw during forward—because computing weight gradients requires it:
 
@@ -145,13 +145,13 @@ Tensor* grad_weights = tensor_matmul(input_transposed, grad_output);
 
 The gradient with respect to weights is the outer product of the cached input and the incoming gradient. This is the chain rule made concrete. And because I'm managing memory manually, I have to remember to free `input_transposed` immediately after use, free old gradients before storing new ones, and free the cache when the layer is destroyed.
 
-I validated all of this with Leaks from macos. The final result is **zero memory leaks** across training and inference.
+I validated all of this with Leaks from macos. The final result is zero memory leaks across training and inference.
 
 ---
 
-## What I'd Do Differently
+## Areas For Improvement
 
-**GPU support.** The current CPU-only design limits me to toy datasets. Real neural network libraries use CUDA or Metal for parallelism. This would be a significant undertaking—essentially a rewrite of the tensor engine. Still, learning how the GPU code works is an extension of the base concepts (memory management, cache access, parallelism, etc), so I'm highly confident going into this with stronger intution.
+**GPU support.** The current CPU-only design limits me to toy datasets. Real neural network libraries use CUDA or Metal for parallelism. This would be a significant undertaking, essentially a rewrite of the tensor engine. Still, learning how the GPU code works is an extension of the base concepts I learned here (memory management, cache access, parallelism, etc), so I'm highly confident going into this with stronger intution.
 
 **More layers and optimizers.** Axiom only has dense layers, ReLU, and softmax. No convolutions, no dropout, no batch norm. The optimizer is vanilla SGD with a fixed learning rate—no momentum, no Adam. The architecture is modular enough that adding these is just a matter of implementing `forward()` and `backward()` for each new component.
 
@@ -163,13 +163,13 @@ I validated all of this with Leaks from macos. The final result is **zero memory
 
 ## Closing Thoughts
 
-Building Axiom has given me strong intuition on the fundamentals and further conviction in my technical ability.
+Building Axiom has given me strong intuition on the low-level mechanics and further conviction in my technical ability.
 
-I now understand C not as syntax but as a way of thinking—where data lives, how it moves, what "ownership" means without a garbage collector. I understand backpropagation to the root level instead of API calling—caching the right values, applying the chain rule, flowing gradients backward through a graph.
+I now understand C not as a low-level scary beast but more as a meticulous and intentional way of thinking about code. In other words, it forces me to consider where data lives, how it moves, what "ownership" means without a garbage collector. I understand backpropagation to the root level instead of API calling—caching the right values, applying the chain rule, flowing gradients backward through a graph.
 
 And I understand PyTorch. When I call `loss.backward()`, I know there's a graph of tensors, each caching its inputs, each computing gradients with respect to its parameters. The magic is just matrix multiplication and careful memory management, repeated a thousand times.
 
-The black box is open.
+~The black box is open~.
 
 ---
 
