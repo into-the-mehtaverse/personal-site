@@ -1,6 +1,6 @@
 ---
 title: "I Wrote a Neural Network Library in Pure C (And You Should Too)"
-descrption: "Pt. 1 of building undeniable technical ability"
+description: "Pt. 1 of building undeniable technical ability"
 pubDate: 2026-02-03
 ---
 
