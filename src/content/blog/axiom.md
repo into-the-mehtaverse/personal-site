@@ -1,6 +1,5 @@
 ---
 title: "I Wrote a Neural Network Library in Pure C (And You Should Too)"
-description: "Axiom is a neural network library in pure C that achieves 96.5% accuracy on MNIST with zero external dependencies."
 pubDate: 2026-02-03
 ---
 
@@ -116,7 +115,7 @@ for (int i = 0; i < m; i++) {
 }
 ```
 
-Now the inner loop walks `B` sequentially across columns and `C` sequentially across columns. Both are cache-friendly. The improvement is dramatic—not from changing the math, but from respecting how hardware actually works.
+Now the inner loop walks `B` sequentially across columns and `C` sequentially across columns. Both are cache-friendly. While the math remains unchanged, the improvement is dramatic as we're now optimally utilizing the hardware.
 
 ### Manual Memory Management & Backpropagation
 
