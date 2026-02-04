@@ -8,7 +8,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		ascending / descending
 	</button>
 	<ul class="journey-list" id="journey-list">
-		<li data-date="2025-11"><span class="date">(nov 2025 - present)</span> open-source RL envs at pufferlib <a href="#">(1)</a>, applesauce agentic framework <a href="#">(2)</a>, neural net from scratch in c <a href="#">(3)</a>, three.js experiments <a href="#">(4)</a>, pnpm starter kit <a href="#">(5)</a></li>
+		<li data-date="2025-11"><span class="date">(nov 2025 - present)</span> <span class="redacted">open-source RL envs at pufferlib <a href="#">(1)</a></span>, <span class="redacted">applesauce agentic framework <a href="#">(2)</a></span>, neural net from scratch in c <a href="/blog/axiom">(3)</a>, <span class="redacted">three.js experiments <a href="#">(4)</a></span>, <span class="redacted">pnpm starter kit <a href="#">(5)</a></span></li>
 		<li data-date="2025-06"><span class="date">(jun 2025 - oct 2025)</span> cto of <em>DealQ</em> - AI underwriting platform for commercial real estate funds. had paying enterprise customers during our private beta. containerized, full-stack app built for production. <a href="#">codebase / technical blog post</a></li>
 		<li data-date="2025-02"><span class="date">(feb 2025 - may 2025)</span> consumer mobile apps. built <a href="#">lastparlay</a> & <a href="#">kibble</a>. 10M views across platforms, 900+ downloads. ran organic ugc + reddit campaigns.</li>
 		<li data-date="2024-09"><span class="date">(sept 2024 - jan 2025)</span> self-teach full stack enginnering curriculum. raw dog, the old way, no ai tools.</li>
@@ -78,6 +78,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 		.sort-toggle:hover {
 			opacity: 0.7;
+		}
+
+		.redacted {
+			background: var(--link-color);
+			color: var(--link-color);
+			border-radius: 2px;
+			padding: 0 1px;
+		}
+
+		.redacted a {
+			color: var(--link-color);
 		}
 	</style>
 </BaseLayout>
