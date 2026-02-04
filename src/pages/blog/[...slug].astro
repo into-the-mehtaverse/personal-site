@@ -44,6 +44,24 @@ const { Content } = await post.render();
 			<a href="/blog">← Back to Blog</a>
 		</footer>
 	</article>
+	<script is:inline src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+	<script is:inline>
+		(function () {
+			function init() {
+				if (typeof mermaid !== 'undefined') {
+					mermaid.initialize({ startOnLoad: false });
+					mermaid.run();
+				} else {
+					setTimeout(init, 50);
+				}
+			}
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', init);
+			} else {
+				init();
+			}
+		})();
+	</script>
 </BaseLayout>
 
 <style>
@@ -77,5 +95,11 @@ const { Content } = await post.render();
 	.post-content :global(ul),
 	.post-content :global(ol) {
 		margin-bottom: 1rem;
+	}
+
+	.post-content :global(.mermaid) {
+		margin: 1.5rem 0;
+		display: flex;
+		justify-content: center;
 	}
 </style>

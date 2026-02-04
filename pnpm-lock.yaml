@@ -27,9 +27,15 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.0
         version: 18.3.7(@types/react@18.3.27)
+      hast-util-to-text:
+        specifier: ^4.0.2
+        version: 4.0.2
       typescript:
         specifier: ^5.5.4
         version: 5.9.3
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.0.0
 
 packages:
 

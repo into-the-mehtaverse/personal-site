@@ -18,6 +18,8 @@
   "devDependencies": {
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
-    "typescript": "^5.5.4"
+    "hast-util-to-text": "^4.0.2",
+    "typescript": "^5.5.4",
+    "unist-util-visit": "^5.0.0"
   }
 }
