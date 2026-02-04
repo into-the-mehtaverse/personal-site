@@ -6,11 +6,18 @@ pubDate: 2026-02-03
 
 Let me introduce you to **Axiom**, a neural network library I wrote in pure C that achieves **96.5% accuracy on MNIST** and has zero external dependencies. It's just ~1,000 lines of C and the standard library.
 
-I began learning ML 100 days ago (I've been documenting my progress daily on [X](https://x.com/MehtaDontStop/status/2015997510330744843)), prior to which, I had no ML experience (my background is in software). In the first ~92 days, I completed Andrew Ng's DeepLearning specialization & three Kaggle comps [(1)](https://github.com/into-the-mehtaverse/machine-learning), built a segmentation studio using the SAM model [(2)](https://github.com/into-the-mehtaverse/segmentation-studio), and wrote the LSTM forward pass in python and pure C without imports [(3)](https://github.com/into-the-mehtaverse/lstm-no-imports). Over the last 8 days, I built Axiom to cement my knowledge and solidify my mastery over the fundamentals.
+I began learning ML 100 days ago (I've been documenting my progress daily on [X](https://x.com/MehtaDontStop/status/2015997510330744843)), prior to which, I had no ML experience (my background is in software). In the first ~92 days, I completed Andrew Ng's DeepLearning specialization & three Kaggle comps [(1)](https://github.com/into-the-mehtaverse/machine-learning), built a segmentation studio using the SAM model [(2)](https://github.com/into-the-mehtaverse/segmentation-studio), and implemented the LSTM forward pass in python and pure C without imports [(3)](https://github.com/into-the-mehtaverse/lstm-no-imports). Over the last 8 days, I built Axiom to cement my knowledge and solidify my mastery over the fundamentals.
 
 My motivation behind building Axiom stems from curiosity. I wasn't satisfied with using methods like Pytorch's "loss.backward()" and training with tensors without knowing what's behind the hood; abstraction removes boilerplate at the expense of deep learning (no pun intended). The only way to truly know is to build it myself.
 
 I used an LLM to scaffold boilerplate (function definitions, etc, directed by me), but every line of logic is mine. The matrix multiplications, the backpropagation, the memory management are all handwritten.
+
+Jump to:
+1. [Architecture](#architecture)
+2. [Technical Revelations](#technical-revelations)
+3. [Areas For Improvement](#areas-for-improvement)
+4. [Closing Thoughts](#closing-thoughts)
+
 
 Quick API usage example:
 
@@ -54,7 +61,9 @@ I purposely built this library modularly so that I can extend it and experiment 
 
 ## Technical Revelations
 
-### Cache-Optimal Matrix Multiplication
+I'll give you three major aha moments that I had while building this.
+
+### 1. Cache-Optimal Matrix Multiplication
 
 My first matmul implementation was the textbook triple loop:
 
@@ -90,7 +99,7 @@ for (int i = 0; i < m; i++) {
 Now the inner loop walks `B` sequentially across columns and `C` sequentially across columns. Both ops become cache-friendly. While the math remains unchanged, the improvement is dramatic as we're now optimally utilizing the hardware.
 
 
-### Stride-Based Tensor Indexing
+### 2. Stride-Based Tensor Indexing
 
 I wanted to understand how a tensor actually works. It turned out to be simpler than I'd imagined: a tensor is just a blob of floats plus metadata that tells me how to interpret them. My `Tensor` struct stores:
 
@@ -111,7 +120,7 @@ This matters because strides let me change how data is viewed without copying it
 All matrix operations like matmul, add, broadcast, etc. use stride-aware indexing. It's what makes the tensor engine general-purpose. When I'm working with large amounts of data with expensive operations, this matters immensely.
 
 
-### Manual Memory Management & Backpropagation
+### 3. Manual Memory Management & Backpropagation
 
 In Python, you allocate objects and the garbage collector cleans up. In C, every `malloc` needs a corresponding `free`, and partial failures need careful unwinding:
 

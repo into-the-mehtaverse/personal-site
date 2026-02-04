@@ -1,12 +1,97 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import InteractiveCanvas from '../components/InteractiveCanvas';
+
+const emoji = '🤫';
+const repeat = 6;
+const line = (emoji + ' ').repeat(repeat) + '';
 ---
 
 <BaseLayout title="Design">
-	<h1>Design</h1>
-	<p>
-		This page supports interactive components. Below is a placeholder for future canvas/three.js work.
-	</p>
-	<InteractiveCanvas client:load />
+	<h1>coming soon</h1>
+
+
+	<div class="emoji-full-bleed">
+		<div class="emoji-line">
+			<div class="emoji-track emoji-track--ltr">
+				<span class="emoji-strip" aria-hidden="true">{line}</span>
+				<span class="emoji-strip" aria-hidden="true">{line}</span>
+			</div>
+		</div>
+		<div class="emoji-line">
+			<div class="emoji-track emoji-track--rtl">
+				<span class="emoji-strip" aria-hidden="true">{line}</span>
+				<span class="emoji-strip" aria-hidden="true">{line}</span>
+			</div>
+		</div>
+		<div class="emoji-line">
+			<div class="emoji-track emoji-track--ltr">
+				<span class="emoji-strip" aria-hidden="true">{line}</span>
+				<span class="emoji-strip" aria-hidden="true">{line}</span>
+			</div>
+		</div>
+	</div>
+
+	<style>
+		.emoji-full-bleed {
+			width: 100vw;
+			position: relative;
+			left: 50%;
+			right: 50%;
+			margin-left: -50vw;
+			margin-right: -50vw;
+			margin-top: 1rem;
+			margin-bottom: 1rem;
+			border-top: 1px solid var(--border-color);
+			border-bottom: 1px solid var(--border-color);
+			overflow-x: hidden;
+		}
+		.emoji-line {
+			overflow: hidden;
+			height: 21rem;
+			min-height: 21rem;
+			max-height: 21rem;
+			display: block;
+			border-bottom: 1px solid var(--border-color);
+		}
+		.emoji-line:last-child {
+			border-bottom: none;
+		}
+		.emoji-track {
+			display: inline-flex;
+			flex-wrap: nowrap;
+			gap: 5rem;
+			animation: scroll-ltr 28s linear infinite;
+			will-change: transform;
+			height: 20rem;
+			align-items: center;
+			white-space: nowrap;
+		}
+		.emoji-track--rtl {
+			animation-name: scroll-rtl;
+		}
+		.emoji-strip {
+			white-space: nowrap;
+			flex-shrink: 0;
+			font-size: 20rem;
+			line-height: 1;
+			user-select: none;
+			display: inline-block;
+		}
+		@keyframes scroll-ltr {
+			0% {
+				transform: translateX(0);
+			}
+			100% {
+				transform: translateX(calc(-50% - 2.5rem));
+			}
+		}
+		@keyframes scroll-rtl {
+			0% {
+				transform: translateX(calc(-50% - 2.5rem));
+			}
+			100% {
+				transform: translateX(0);
+			}
+		}
+	</style>
 </BaseLayout>
