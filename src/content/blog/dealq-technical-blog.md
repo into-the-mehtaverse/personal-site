@@ -125,7 +125,6 @@ I chose **feature-based organization** on the frontend to keep related functiona
 
 **Key Components:**
 - **Custom Document Viewers** - Built PDF and Excel viewers with gesture handling for desktop. Using custom-styled radix primitives for more complex components and ShadCN elsewhere.
-- **OM Viewer** (`@/features/deals/summary`) - Combines PDF viewer with AI-powered classification tooltips that link page numbers to extracted data points
 - **Feature Stores** - Zustand stores scoped to features with actions, selectors, and types for clean state management that can be maintained across workflows. (I love Zustand and use it for all my projects)
 
 ## Rent Roll Pipeline Design
