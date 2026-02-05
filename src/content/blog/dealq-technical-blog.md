@@ -6,7 +6,7 @@ pubDate: 2025-10-14
 
 Let me introduce you to **DealQ**, the AI workflow platform I built for commercial real estate investors.
 
-I wrote this blog post to show the technical decision-making and problem-solving that went into building this codebase, what I've learned from the process, and how I'd approach things differently next time.
+I'm writing this blog post to show the technical decision-making and problem-solving that went into building this codebase, what I've learned from the process, and how I'd approach things differently next time.
 
 As the sole technical co-founder, I architected and coded the platform into production, from schema design to web app design to infra, and it was being used by multiple enterprise customers during our private beta. It was built with scale and future feature shipments in mind. The company has since wound down for reasons outside the scope of this article and I am no longer shipping feature updates.
 
