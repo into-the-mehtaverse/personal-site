@@ -118,9 +118,30 @@ const isActive = (path: string) => {
 		padding: 4rem 1rem 2rem 1rem;
 	}
 
+	@media (max-width: 768px) {
+		body {
+			padding-left: 1.5rem;
+			padding-right: 1.5rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		body {
+			padding-left: 2rem;
+			padding-right: 2rem;
+		}
+	}
+
 	.container {
 		width: 40%;
 		margin: 0 auto;
+	}
+
+	@media (max-width: 768px) {
+		.container {
+			width: 100%;
+			max-width: 100%;
+		}
 	}
 
 	.site-header {

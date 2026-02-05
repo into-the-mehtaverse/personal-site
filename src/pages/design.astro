@@ -7,8 +7,9 @@ const line = (emoji + ' ').repeat(repeat) + '';
 ---
 
 <BaseLayout title="Design">
-	<h1>coming soon</h1>
-
+	<div class="design-header">
+		<h1>coming soon</h1>
+	</div>
 
 	<div class="emoji-full-bleed">
 		<div class="emoji-line">
@@ -32,6 +33,9 @@ const line = (emoji + ' ').repeat(repeat) + '';
 	</div>
 
 	<style>
+		.design-header {
+			margin-bottom: 0;
+		}
 		.emoji-full-bleed {
 			width: 100vw;
 			position: relative;
@@ -57,6 +61,7 @@ const line = (emoji + ' ').repeat(repeat) + '';
 			border-bottom: none;
 		}
 		.emoji-track {
+			--scroll-offset: 2.5rem;
 			display: inline-flex;
 			flex-wrap: nowrap;
 			gap: 5rem;
@@ -77,17 +82,42 @@ const line = (emoji + ' ').repeat(repeat) + '';
 			user-select: none;
 			display: inline-block;
 		}
+		@media (max-width: 768px) {
+			.design-header {
+				margin-bottom: 2rem;
+			}
+			.emoji-full-bleed {
+				margin-top: 2rem;
+			}
+			.emoji-line {
+				height: 11rem;
+				min-height: 11rem;
+				max-height: 11rem;
+				margin-bottom: 1.25rem;
+			}
+			.emoji-line:last-child {
+				margin-bottom: 0;
+			}
+			.emoji-track {
+				height: 10rem;
+				gap: 2.5rem;
+				--scroll-offset: 1.25rem;
+			}
+			.emoji-strip {
+				font-size: 10rem;
+			}
+		}
 		@keyframes scroll-ltr {
 			0% {
 				transform: translateX(0);
 			}
 			100% {
-				transform: translateX(calc(-50% - 2.5rem));
+				transform: translateX(calc(-50% - var(--scroll-offset)));
 			}
 		}
 		@keyframes scroll-rtl {
 			0% {
-				transform: translateX(calc(-50% - 2.5rem));
+				transform: translateX(calc(-50% - var(--scroll-offset)));
 			}
 			100% {
 				transform: translateX(0);
