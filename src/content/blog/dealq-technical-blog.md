@@ -26,17 +26,13 @@ The original vision for DealQ was a platform where CRE (commercial real estate) 
 
 **What that means to you as someone who probably doesn't know anything about real estate**:
 
-A CRE investor typically receives dozens of deals per week. There are three primary documents per deal, all of which are highly variable and messy, usually PDF or Excel files, namely:
+A CRE investor typically receives dozens of deals per week. There are three primary documents per deal, all of which are highly variable, messy, and usually PDF or Excel files. Every real estate firm has highly paid analysts that extract and structure data from the these docs and insert them into the firm's proprietary Excel-based financial model.
 
-1. The offering memorandum - a 20-40 page unstructured PDF which contains the investment narrative and high-level financial info.
-
-2. The rent roll - multi-page document that contains all the unit data and rents of the property
-
-3. The trailing twelve statement - essentially an income statement for the last twelve months at the property
-
-Every real estate firm has highly paid analysts that extract and structure data from the above docs and insert them into the firm's proprietary Excel-based financial model. This process takes anywhere from 30 minutes to multiple hours per property. DealQ's underwriting workflow cut this process down to under 10 minutes.
+This process takes anywhere from 30 minutes to multiple hours per property and needs the data to be 100% accurate otherwise the financial model won't work. **DealQ's underwriting workflow cut this process down to under 10 minutes.**
 
 ![demo-gif](/screenshots/demo-gif.gif)
+
+*^A quick run through of the extraction workflow*
 
 ## Technical Challenges / Accomplishments
 
@@ -121,17 +117,16 @@ I chose **feature-based organization** on the frontend to keep related functiona
 - **`/marketing`** - All pre-auth pages (landing, sign-in, pricing) separated from the main app
 - **`/features`** - Feature-specific components, stores, and logic (deals, verification, billing)
 - **`/components`** - Reusable UI primitives and app-wide components
-- **`/lib/api`** - Centralized API actions providing a clear interface to backend capabilities. All API actions are happening server-side with "use server".
+- **`/lib/api`** - Centralized API actions providing a clear interface to backend capabilities. All API actions are happening server-side (did not use React Query - see [areas for improvement](#areas-for-improvement))
 
 **Key Components:**
 - **Custom Document Viewers** - Built PDF and Excel viewers with gesture handling for desktop. Using custom-styled radix primitives for more complex components and ShadCN elsewhere.
-- **Feature Stores** - Zustand stores scoped to features with actions, selectors, and types for clean state management that can be maintained across workflows. (I love Zustand and use it for all my projects)
-
+- **Feature Stores** - Zustand stores scoped to features with actions, selectors, and types for clean state management that can be maintained across workflows.
 ## Rent Roll Pipeline Design
 
 Here's a deep dive on a specific challenge I encountered while building the extraction pipeline. I am including this section so you can get a sense of how I think about technical problems. I'll start by framing what we're trying to do, defining the criteria for success, and finally, you'll read a blurb on how I iterated to the final solution.
 
-**The Problem** Rent roll documents contain hundreds of units, duplicate information, inconsistent formatting between buildings and row-level inconsistencies as well. See the below screenshot as an example. The investor needs to boil this information down to just the occupying resident's information and current lease rent (no parking or discounts etc). We need to create a system that can handle all sorts of inconsistencies and get the accurate information out in a structured fashion with the same accuracy as a real estate analyst in a fraction of the time.
+**The Problem**: Rent roll documents contain hundreds of units, duplicate information, inconsistent formatting between buildings and row-level inconsistencies as well. See the below screenshot as an example. The investor needs to boil this information down to just the occupying resident's information and current lease rent (no parking or discounts etc). We need to create a system that can handle all sorts of inconsistencies and get the accurate information out in a structured fashion with the same accuracy as a real estate analyst in a fraction of the time.
 
 ![Rent Roll Screenshot](/screenshots/rent-roll-screenshot.png)
 
@@ -214,17 +209,21 @@ I asked them to return an array of arrays:
 
 ## Areas For Improvement
 
-1. Memory management
+**1. Memory management**
 
 Any application which processes large amounts of PDFs and excel files must have file streamining and memory limits. DealQ in its current form writes the file to a temp location while pulling the raw text. The Supabase Storage API's stremaing functionality was giving me trouble, so for the sake of shipping the private beta (very controlled), I put a file upload size limit on the front end, beefed up memory on the droplet, and pushed a ticket for fixing this before a full launch.
 
-2. Language choice & Type Safety
+**2. Language choice & type safety**
 
 For DealQ, I built the backend with Python and the frontend with Typescript. I did this because I like coding in Python, but the multi-language codebase resulted in more complexity without any clear benefit. Looking back, I would have built fully Typescript across the codebase. Had any need arose for a library or service in another language, I'd have just deployed a microservice for the specific use case while keeping as much in TS as possible. Specifically, type safety and maintaing consistency in data models across the FE / BE became a nightmare. I used pydantic for backend typing, but defined type interfaces manually in component files / api action files on the frontend (an oversight, I should've used Zod but didn't know better when I started). Had I gone full Typescript, I could have built a shared types package in the root of the monorepo and had both apps require it as a dependency.
 
-3. Database management
+**3. Database management**
 
 I did a terrible job at a managing DB migrations - I defined schemas, RLS policies, triggers, etc. in non-chronologically organized files with inconsistent naming and directly ran them in the SQL editor on Supabase while keeping records of what I ran in a /db folder in the backend. I get shudders when I think about this now. I should have built clean, reproducible, and reversible migrations with clear chronological naming and managed migrations effectively through scripts via the cli. I've changed the way I handle db management entirely after the mistakes on DealQ.
+
+**4. API layer and data fetching**
+
+All API actions lived in `/lib/api` and ran server-side (Next.js "use server"), which kept the backend boundary clear but left the frontend without a real data-fetching strategy. I didn't use React Query (or anything like it), so every screen that needed data either re-fetched on mount or relied on manual refetches. For a workflow-heavy app where the same deal or document data is used across multiple views, that meant unnecessary refetches and loading/error state handled ad-hoc in Zustand stores and components. I should have introduced a client-side data layer (e.g. TanStack Query) and treated server actions as the source of truth that the client layer calls and caches. Would have simplified the UI code and made the app feel faster without changing the backend.
 
 ---
 
