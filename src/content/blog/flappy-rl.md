@@ -16,7 +16,7 @@ As someone who's been diving into ML the last 107 days (see my daily status upda
 
 ### The Flappy Bird Process
 
-I'll walk you through some of the iterations I went through before reaching the final checkpoint that beat the game fully. At the end, I'll include a chart with the metrics for each one and my key takeaways / learnings. If you want to skip ahead, [click here](#iteration-summary).
+I'll walk you through some of the iterations I went through before reaching the final checkpoint that beat the game fully. At the end, I'll include a chart with the metrics for each one and my key takeaways / learnings. If you want to skip ahead, [click here](#version-6-the-final-version).
 
 **Version 1:** 2 grid Flappy Bird - literally just played in the terminal, where the only options are roof and floor. If the bird is up, it should go down, and if it's down, it should go up. +1 for correct, -1 if it dies. This converged pretty quickly on a tiny feed-forward policy of ~17.7K params.
 
